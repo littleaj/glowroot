@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.glowroot</groupId>
-      <artifactId>glowroot-engine</artifactId>
+      <artifactId>glowroot-engine-unshaded</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -37,7 +37,7 @@
     <module>build/multi-lib-tests</module>
     <module>annotation-api</module>
     <module>instrumentation-api</module>
-    <module>engine</module>
+    <module>engine-unshaded</module>
     <module>shared/common</module>
     <module>shared/common2</module>
     <module>shared/wire-api</module>
@@ -53,6 +53,7 @@
     <module>agent/shaded/central-https-windows</module>
     <module>agent/shaded/central-https-osx</module>
     <module>agent/shaded/logging-logstash</module>
+    <module>agent/shaded/engine</module>
     <module>agent/integration-tests</module>
     <module>instrumentation/camel</module>
     <module>instrumentation/cassandra</module>

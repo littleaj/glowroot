@@ -24,11 +24,13 @@ import java.util.jar.JarFile;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JarFileShadingIT {
 
+    @Ignore
     @Test
     public void shouldCheckThatJarIsWellShaded() throws IOException {
         File glowrootCoreJarFile = getGlowrootAgentJarFile();

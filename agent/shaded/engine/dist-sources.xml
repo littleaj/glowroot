@@ -9,7 +9,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>org.glowroot:glowroot-agent-core:*:sources</include>
+        <include>org.glowroot:glowroot-engine:*:sources</include>
       </includes>
       <useProjectAttachments>true</useProjectAttachments>
       <unpack>true</unpack>
