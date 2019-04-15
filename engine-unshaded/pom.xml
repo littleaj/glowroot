@@ -10,10 +10,10 @@
     <version>0.13.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>glowroot-engine</artifactId>
+  <artifactId>glowroot-engine-unshaded</artifactId>
 
-  <name>Glowroot Engine</name>
-  <description>Glowroot Engine</description>
+  <name>Glowroot Engine (Unshaded)</name>
+  <description>Glowroot Engine (Unshaded)</description>
 
   <properties>
     <asm.version>7.0</asm.version>
