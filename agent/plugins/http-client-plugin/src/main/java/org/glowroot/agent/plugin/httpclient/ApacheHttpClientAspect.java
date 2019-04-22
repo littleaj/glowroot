@@ -15,27 +15,28 @@
  */
 package org.glowroot.agent.plugin.httpclient;
 
-import java.net.URI;
-
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpUriRequest;
-
 import org.glowroot.agent.plugin.api.Agent;
-import org.glowroot.agent.plugin.api.MessageSupplier;
 import org.glowroot.agent.plugin.api.ThreadContext;
 import org.glowroot.agent.plugin.api.TimerName;
 import org.glowroot.agent.plugin.api.TraceEntry;
 import org.glowroot.agent.plugin.api.checker.Nullable;
 import org.glowroot.agent.plugin.api.weaving.BindParameter;
+import org.glowroot.agent.plugin.api.weaving.BindReturn;
 import org.glowroot.agent.plugin.api.weaving.BindThrowable;
 import org.glowroot.agent.plugin.api.weaving.BindTraveler;
 import org.glowroot.agent.plugin.api.weaving.OnBefore;
 import org.glowroot.agent.plugin.api.weaving.OnReturn;
 import org.glowroot.agent.plugin.api.weaving.OnThrow;
 import org.glowroot.agent.plugin.api.weaving.Pointcut;
+import org.glowroot.agent.plugin.httpclient._.HttpResponseMessageSupplier;
 import org.glowroot.agent.plugin.httpclient._.Uris;
+
+import java.net.URI;
 
 // see nearly identical copy of this in WiremockApacheHttpClientAspect
 public class ApacheHttpClientAspect {
@@ -51,26 +52,30 @@ public class ApacheHttpClientAspect {
             if (request == null) {
                 return null;
             }
+
+            HttpResponseMessageSupplier supplier = new HttpResponseMessageSupplier();
+
             String method = request.getMethod();
-            if (method == null) {
-                method = "";
-            } else {
-                method += " ";
+            if (method != null) {
+                supplier.setHttpMethod(method);
             }
+
             URI uriObj = request.getURI();
-            String uri;
-            if (uriObj == null) {
-                uri = "";
-            } else {
+            String uri = "";
+            if (uriObj != null) {
                 uri = uriObj.toString();
+                supplier.setUri(uri);
             }
-            return context.startServiceCallEntry("HTTP", method + Uris.stripQueryString(uri),
-                    MessageSupplier.create("http client request: {}{}", method, uri),
-                    timerName);
+
+            return context.startServiceCallEntry("HTTP", method + Uris.stripQueryString(uri), supplier, timerName);
         }
         @OnReturn
-        public static void onReturn(@BindTraveler @Nullable TraceEntry traceEntry) {
+        public static void onReturn(@BindReturn HttpResponse response, @BindTraveler @Nullable TraceEntry traceEntry) {
             if (traceEntry != null) {
+                HttpResponseMessageSupplier supplier = (HttpResponseMessageSupplier) traceEntry.getMessageSupplier();
+                final int statusCode = response.getStatusLine().getStatusCode();
+                supplier.setStatusCode(statusCode);
+
                 traceEntry.end();
             }
         }
@@ -100,24 +105,35 @@ public class ApacheHttpClientAspect {
             if (requestLine == null) {
                 return null;
             }
+
+            HttpResponseMessageSupplier supplier = new HttpResponseMessageSupplier();
+
             String method = requestLine.getMethod();
-            if (method == null) {
-                method = "";
-            } else {
-                method += " ";
+            if (method != null) {
+                supplier.setHttpMethod(method);
             }
-            String host = hostObj == null ? "" : hostObj.toURI();
+
+            if (hostObj != null) {
+                supplier.setHost(hostObj.toURI());
+            }
+
             String uri = requestLine.getUri();
-            if (uri == null) {
-                uri = "";
+            if (uri != null) {
+                supplier.setUri(uri);
             }
+
             return context.startServiceCallEntry("HTTP", method + Uris.stripQueryString(uri),
-                    MessageSupplier.create("http client request: {}{}{}", method, host, uri),
+                    supplier,
+//                    MessageSupplier.create("http client request: {}{}{}", method, host, uri),
                     timerName);
         }
         @OnReturn
-        public static void onReturn(@BindTraveler @Nullable TraceEntry traceEntry) {
+        public static void onReturn(@BindReturn HttpResponse response, @BindTraveler @Nullable TraceEntry traceEntry) {
             if (traceEntry != null) {
+                HttpResponseMessageSupplier supplier = (HttpResponseMessageSupplier) traceEntry.getMessageSupplier();
+                final int statusCode = response.getStatusLine().getStatusCode();
+                supplier.setStatusCode(statusCode);
+
                 traceEntry.end();
             }
         }
